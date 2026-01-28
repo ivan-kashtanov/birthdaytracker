@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать день рождения</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>✏️ Редактировать день рождения</h1>
+        <a href="index.html" class="btn-small">← На главную</a>
+    </header>
+
+    <nav class="menu">
+        <a href="index.html">Главная</a>
+        <a href="all.html">Все дни рождения</a>
+        <a href="create.html">Добавить ДР</a>
+    </nav>
+
+    <div id="loading">Загрузка данных...</div>
+
+    <form id="edit-form" class="form" style="display: none;">
+        <div class="form-group">
+            <label>Полное имя:</label>
+            <input type="text" id="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label>Дата рождения:</label>
+            <input type="date" id="birthday" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email (необязательно):</label>
+            <input type="email" id="email">
+        </div>
+
+        <div class="form-group">
+            <label>Новое фото (необязательно):</label>
+            <input type="file" id="newPhoto" accept="image/*">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">Сохранить</button>
+            <button type="button" onclick="window.history.back()" class="btn btn-gray">Отмена</button>
+            <button type="button" onclick="deleteCurrentPhoto()" class="btn btn-danger">Удалить фото</button>
+        </div>
+
+        <div id="message"></div>
+    </form>
+</div>
+
+<script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    async function loadBirthday() {
+        try {
+            const response = await fetch(`http://localhost:8080/api/birthdays/${id}`);
+            const person = await response.json();
+
+            document.getElementById('fullName').value = person.fullName;
+            document.getElementById('birthday').value = person.birthday;
+            document.getElementById('email').value = person.email || '';
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('edit-form').style.display = 'block';
+        } catch (error) {
+            document.getElementById('loading').innerHTML = '<p class="error">Ошибка загрузки</p>';
+        }
+    }
+
+    document.getElementById('edit-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const personData = {
+            fullName: document.getElementById('fullName').value,
+            birthday: document.getElementById('birthday').value,
+            email: document.getElementById('email').value || null
+        };
+
+        const photoFile = document.getElementById('newPhoto').files[0];
+        const formData = new FormData();
+
+        formData.append('person', new Blob([JSON.stringify(personData)], {
+            type: 'application/json'
+        }));
+
+        if (photoFile) {
+            formData.append('photo', photoFile);
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/birthdays/update/${id}`, {
+                method: 'PUT',
+                body: formData
+            });
+
+            if (response.ok) {
+                document.getElementById('message').innerHTML =
+                    '<p class="success">Запись успешно обновлена!</p>';
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                document.getElementById('message').innerHTML =
+                    '<p class="error">Ошибка при обновлении</p>';
+            }
+        } catch (error) {
+            document.getElementById('message').innerHTML =
+                '<p class="error">Ошибка соединения</p>';
+        }
+    });
+
+    async function deleteCurrentPhoto() {
+        if (!confirm('Удалить фотографию?')) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/birthdays/${id}/photo`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Фото удалено');
+            }
+        } catch (error) {
+            alert('Ошибка при удалении фото');
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', loadBirthday);
+</script>
+</body>
+</html>

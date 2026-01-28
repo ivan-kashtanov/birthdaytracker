@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Tracker - Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #3498db;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .menu a:hover {
+            background-color: #f0f8ff;
+        }
+
+        .menu a.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .days-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .days-selector input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .birthday-list {
+            margin-top: 15px;
+        }
+
+        .birthday-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            gap: 15px;
+        }
+
+        /* Блок для фото - в стиле из первого примера */
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        .avatar .initials {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .person-info {
+            flex: 1;
+        }
+
+        .person-info strong {
+            font-size: 16px;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .person-info p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 3px 0;
+        }
+
+        .photo-info {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .photo-info.has-photo {
+            color: #27ae60;
+        }
+
+        .photo-info.no-photo {
+            color: #95a5a6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+
+        .empty, .error, .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .birthday-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 20px;
+            }
+
+            .actions {
+                align-self: flex-end;
+            }
+
+            .days-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🎂 Birthday Tracker</h1>
+        <p class="subtitle">Отслеживание дней рождения</p>
+    </header>
+
+    <nav class="menu">
+        <a href="index.html" class="active">Главная</a>
+        <a href="all.html">Все дни рождения</a>
+        <a href="create.html">Добавить ДР</a>
+    </nav>
+
+    <main>
+        <section class="section">
+            <h2>🎉 Сегодня празднуют:</h2>
+            <div id="today-list" class="birthday-list">
+                <p>Загрузка...</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📅 Ближайшие дни рождения:</h2>
+            <div class="days-selector">
+                <label>Показать дни рождения в ближайшие:</label>
+                <input type="number" id="days-count" value="7" min="1" max="365">
+                <span>дней</span>
+                <button onclick="loadUpcomingBirthdays()" class="btn">Показать</button>
+            </div>
+            <div id="upcoming-list" class="birthday-list">
+                <p>Выберите количество дней и нажмите "Показать"</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api/birthdays';
+
+    function getPhotoUrl(person) {
+        if (!person.photo) return null;
+        if (person.photo.startsWith('http')) return person.photo;
+        if (person.photo.startsWith('/')) return person.photo;
+        return `/api/photos/${person.photo}`;
+    }
+
+    function getInitials(fullName) {
+        if (!fullName) return '?';
+        return fullName.split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function createAvatarElement(person, photoUrl, initials) {
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'avatar';
+        avatarDiv.title = escapeHtml(person.fullName);
+
+        if (photoUrl) {
+            const img = document.createElement('img');
+            img.src = photoUrl;
+            img.alt = escapeHtml(person.fullName);
+            img.style.opacity = '0';
+
+            img.onload = function() {
+                this.style.opacity = '1';
+            };
+
+            img.onerror = function() {
+                avatarDiv.innerHTML = `<div class="initials">${initials}</div>`;
+            };
+
+            avatarDiv.appendChild(img);
+        } else {
+            avatarDiv.innerHTML = `<div class="initials">${initials}</div>`;
+        }
+
+        return avatarDiv;
+    }
+
+    async function loadTodayBirthdays() {
+        try {
+            const response = await fetch(`${API_BASE}/today`);
+            const birthdays = await response.json();
+            const container = document.getElementById('today-list');
+
+            if (birthdays.length === 0) {
+                container.innerHTML = '<p class="empty">Сегодня никто не празднует день рождения</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            birthdays.forEach(person => {
+                const photoUrl = getPhotoUrl(person);
+                const initials = getInitials(person.fullName);
+
+                const item = document.createElement('div');
+                item.className = 'birthday-item';
+
+                const avatar = createAvatarElement(person, photoUrl, initials);
+                item.appendChild(avatar);
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'person-info';
+                infoDiv.innerHTML = `
+                    <strong>${escapeHtml(person.fullName)}</strong>
+                    <p>📅 ${formatDate(person.birthday)}</p>
+                    ${person.email ? `<p>📧 ${escapeHtml(person.email)}</p>` : ''}
+                    ${person.photo
+                    ? `<p class="photo-info has-photo">📷 ${escapeHtml(person.photo.substring(0, 8))}...</p>`
+                    : '<p class="photo-info no-photo">📷 Нет фото</p>'
+                }
+                `;
+                item.appendChild(infoDiv);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'actions';
+                actionsDiv.innerHTML = `
+                    <button onclick="editBirthday(${person.id})" class="btn-small">✏️</button>
+                    <button onclick="deleteBirthday(${person.id})" class="btn-small btn-danger">🗑️</button>
+                `;
+                item.appendChild(actionsDiv);
+
+                container.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки сегодняшних дней рождения:', error);
+            document.getElementById('today-list').innerHTML = '<p class="error">Ошибка загрузки</p>';
+        }
+    }
+
+    async function loadUpcomingBirthdays() {
+        const days = document.getElementById('days-count').value || 7;
+        const container = document.getElementById('upcoming-list');
+
+        try {
+            const response = await fetch(`${API_BASE}/around/${days}`);
+            const birthdays = await response.json();
+
+            if (birthdays.length === 0) {
+                container.innerHTML = `<p class="empty">В ближайшие ${days} дней дней рождений нет</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            birthdays.forEach(person => {
+                const photoUrl = getPhotoUrl(person);
+                const initials = getInitials(person.fullName);
+
+                const item = document.createElement('div');
+                item.className = 'birthday-item';
+
+                const avatar = createAvatarElement(person, photoUrl, initials);
+                item.appendChild(avatar);
+
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'person-info';
+                infoDiv.innerHTML = `
+                    <strong>${escapeHtml(person.fullName)}</strong>
+                    <p>📅 ${formatDate(person.birthday)} (через ${getDaysUntil(person.birthday)} дней)</p>
+                    ${person.email ? `<p>📧 ${escapeHtml(person.email)}</p>` : ''}
+                    ${person.photo
+                    ? `<p class="photo-info has-photo">📷 ${escapeHtml(person.photo.substring(0, 8))}...</p>`
+                    : '<p class="photo-info no-photo">📷 Нет фото</p>'
+                }
+                `;
+                item.appendChild(infoDiv);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'actions';
+                actionsDiv.innerHTML = `
+                    <button onclick="editBirthday(${person.id})" class="btn-small">✏️</button>
+                    <button onclick="deleteBirthday(${person.id})" class="btn-small btn-danger">🗑️</button>
+                `;
+                item.appendChild(actionsDiv);
+
+                container.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки ближайших дней рождения:', error);
+            container.innerHTML = '<p class="error">Ошибка загрузки</p>';
+        }
+    }
+
+    async function deleteBirthday(id) {
+        if (!confirm('Удалить эту запись?')) return;
+
+        try {
+            await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+            loadTodayBirthdays();
+            loadUpcomingBirthdays();
+        } catch (error) {
+            alert('Ошибка при удалении');
+        }
+    }
+
+    function editBirthday(id) {
+        window.location.href = `edit.html?id=${id}`;
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU');
+    }
+
+    function getDaysUntil(birthday) {
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const birthDate = new Date(birthday);
+
+        const nextBirthday = new Date(
+            today.getFullYear(),
+            birthDate.getMonth(),
+            birthDate.getDate()
+        );
+
+        if (nextBirthday < todayStart) {
+            nextBirthday.setFullYear(today.getFullYear() + 1);
+        }
+
+        const diffTime = nextBirthday - todayStart;
+
+        const daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return daysDiff;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTodayBirthdays();
+        loadUpcomingBirthdays();
+    });
+</script>
+</body>
+</html>

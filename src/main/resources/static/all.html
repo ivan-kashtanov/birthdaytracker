@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все дни рождения</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #3498db;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .menu a:hover {
+            background-color: #f0f8ff;
+        }
+
+        .menu a.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-small {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .birthday-list {
+            margin-top: 15px;
+        }
+
+        .birthday-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .person-info {
+            flex: 1;
+        }
+
+        .person-info strong {
+            font-size: 16px;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .person-info p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 3px 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty, .error, .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .birthday-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .actions {
+                align-self: flex-end;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📋 Все дни рождения</h1>
+
+    </header>
+
+    <nav class="menu">
+        <a href="/">Главная</a>
+        <a href="/all.html" class="active">Все дни рождения</a>
+        <a href="/create.html">Добавить ДР</a>
+    </nav>
+
+    <div class="filters">
+        <input type="text" id="search" placeholder="Поиск по имени..." oninput="loadAllBirthdays()">
+        <select id="month" onchange="loadAllBirthdays()">
+            <option value="">Все месяцы</option>
+            <option value="1">Январь</option>
+            <option value="2">Февраль</option>
+            <option value="3">Март</option>
+            <option value="4">Апрель</option>
+            <option value="5">Май</option>
+            <option value="6">Июнь</option>
+            <option value="7">Июль</option>
+            <option value="8">Август</option>
+            <option value="9">Сентябрь</option>
+            <option value="10">Октябрь</option>
+            <option value="11">Ноябрь</option>
+            <option value="12">Декабрь</option>
+        </select>
+        <select id="sortBy" onchange="loadAllBirthdays()">
+            <option value="name">Сортировка по имени</option>
+            <option value="birthday">Сортировка по дате</option>
+        </select>
+        <button onclick="resetFilters()" class="btn">Сбросить</button>
+    </div>
+
+    <div id="all-list" class="birthday-list">
+        <p class="loading">Загрузка...</p>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api/birthdays';
+
+    async function loadAllBirthdays() {
+        const params = new URLSearchParams({
+            search: document.getElementById('search').value,
+            month: document.getElementById('month').value,
+            sortBy: document.getElementById('sortBy').value,
+            sortOrder: 'asc'
+        });
+
+        try {
+            const response = await fetch(`${API_BASE}?${params}`);
+            const birthdays = await response.json();
+            const container = document.getElementById('all-list');
+
+            if (birthdays.length === 0) {
+                container.innerHTML = '<p class="empty">Нет записей</p>';
+                return;
+            }
+
+            container.innerHTML = birthdays.map(person => {
+                const initials = getInitials(person.fullName);
+
+                let photoUrl = null;
+                if (person.photo) {
+                    photoUrl = `/api/photos/${person.photo}`;
+                }
+
+                return `
+                    <div class="birthday-item">
+                        <div class="avatar" title="${person.fullName}">
+                            ${photoUrl
+                    ? `<img src="${photoUrl}" alt="${person.fullName}"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;\\'>${initials}</div>';"
+                                     onload="this.style.opacity='1';" style="opacity:0; transition: opacity 0.3s;">`
+                    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">${initials}</div>`
+                }
+                        </div>
+                        <div class="person-info">
+                            <strong>${escapeHtml(person.fullName)}</strong>
+                            <p>📅 ${formatDate(person.birthday)} (${calculateAge(person.birthday)} лет)</p>
+                            ${person.email ? `<p>📧 ${escapeHtml(person.email)}</p>` : ''}
+                            ${person.photo
+                    ? `<p style="color:#27ae60; font-size:12px;">📷 ${person.photo.substring(0, 8)}...</p>`
+                    : '<p style="color:#95a5a6; font-size:12px;">📷 Нет фото</p>'
+                }
+                        </div>
+                        <div class="actions">
+                            <button onclick="editBirthday(${person.id})" class="btn">✏️</button>
+                            <button onclick="deleteBirthday(${person.id})" class="btn btn-danger">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            document.getElementById('all-list').innerHTML = '<p class="error">Ошибка загрузки данных</p>';
+        }
+    }
+
+    function resetFilters() {
+        document.getElementById('search').value = '';
+        document.getElementById('month').value = '';
+        document.getElementById('sortBy').value = 'name';
+        loadAllBirthdays();
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
+    function calculateAge(birthDate) {
+        const today = new Date();
+        const birth = new Date(birthDate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+
+        return age;
+    }
+
+    function getInitials(fullName) {
+        if (!fullName) return '?';
+        return fullName.split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function editBirthday(id) {
+        window.location.href = `/edit.html?id=${id}`;
+    }
+
+    async function deleteBirthday(id) {
+        if (!confirm('Удалить эту запись?')) return;
+
+        try {
+            const response = await fetch(`${API_BASE}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                loadAllBirthdays();
+            } else {
+                alert('Ошибка при удалении');
+            }
+        } catch (error) {
+            alert('Ошибка при удалении: ' + error.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllBirthdays);
+</script>
+</body>
+</html>
