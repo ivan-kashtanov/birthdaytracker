@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import ru.birthdaytracker.entity.PersonBirthday;
 import ru.birthdaytracker.repository.PersonBirthdayImpl;
@@ -14,14 +13,12 @@ import ru.birthdaytracker.utils.Helpers;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class PersonBirthdayService {
     private final PersonBirthdayImpl personBirthdayImpl;
-    private PersonBirthdayImpl personBirthday;
     private final PhotoService photoService;
 
     /**
@@ -35,7 +32,7 @@ public class PersonBirthdayService {
                                                    String sortOrder) {
         log.info("Get all active person birthdays");
 
-        List<PersonBirthday> birthdayList = personBirthdayImpl.findAllByActiveTrue();
+        List<PersonBirthday> birthdayList = personBirthdayImpl.findAllPersonBirthdays();
 
         if(search!= null && !search.trim().isEmpty()) {
             birthdayList = Helpers.filterBySearchFullName(birthdayList, search);

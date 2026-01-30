@@ -14,7 +14,7 @@ public interface PersonBirthdayImpl extends JpaRepository<PersonBirthday, Long> 
     */
     @Query("select p from PersonBirthday p " +
             "ORDER BY p.birthday ASC")
-    List<PersonBirthday> findAllByActiveTrue();
+    List<PersonBirthday> findAllPersonBirthdays();
 
     /**
      * Поиск всех ближайжих на N записей дней рождения

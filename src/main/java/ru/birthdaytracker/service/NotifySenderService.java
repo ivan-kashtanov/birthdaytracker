@@ -1,6 +1,7 @@
 package ru.birthdaytracker.service;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,18 +19,16 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotifySenderService {
-    private PersonBirthdayImpl personBirthday;
-    private JavaMailSender mailSender;
+
+    private final PersonBirthdayImpl personBirthday;
+    private final JavaMailSender mailSender;
 
     @Value("${app.email.from}")
     private String fromEmail;
 
-    @Value("${app.email.from-name}")
-    private String fromName;
-
     @Value("${app.email.enabled}")
-
     private boolean emailEnabled;
 
     @Scheduled(cron = "${interval-in-cron}")
