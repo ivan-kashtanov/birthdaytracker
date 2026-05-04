@@ -82,7 +82,7 @@ def calculate_risk(counters):
 
 
 def get_decision(risk):
-    if risk >= 50:
+    if risk >= 200:
         return "DENY"
 
     if risk >= 20:
