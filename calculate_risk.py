@@ -17,19 +17,33 @@ WEIGHTS = {
 }
 
 
+def load_json_safe(report_path):
+    if not os.path.exists(report_path):
+        return None
+
+    if os.path.getsize(report_path) == 0:
+        return None
+
+    try:
+        with open(report_path, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        return None
+
+
 def add_score(severity, counters):
     severity = str(severity).upper()
+
     if severity not in counters:
-        counters[severity] = 0
+        severity = "UNKNOWN"
+
     counters[severity] += 1
 
 
 def parse_trivy(report_path, counters):
-    if not os.path.exists(report_path):
+    data = load_json_safe(report_path)
+    if data is None:
         return
-
-    with open(report_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
 
     for result in data.get("Results", []):
         for vulnerability in result.get("Vulnerabilities", []):
@@ -40,22 +54,18 @@ def parse_trivy(report_path, counters):
 
 
 def parse_snyk(report_path, counters):
-    if not os.path.exists(report_path):
+    data = load_json_safe(report_path)
+    if data is None:
         return
-
-    with open(report_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
 
     for vulnerability in data.get("vulnerabilities", []):
         add_score(vulnerability.get("severity", "UNKNOWN"), counters)
 
 
 def parse_grype(report_path, counters):
-    if not os.path.exists(report_path):
+    data = load_json_safe(report_path)
+    if data is None:
         return
-
-    with open(report_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
 
     for match in data.get("matches", []):
         vulnerability = match.get("vulnerability", {})
@@ -64,16 +74,20 @@ def parse_grype(report_path, counters):
 
 def calculate_risk(counters):
     risk = 0
+
     for severity, count in counters.items():
         risk += WEIGHTS.get(severity, 1) * count
+
     return risk
 
 
 def get_decision(risk):
     if risk >= 50:
         return "DENY"
+
     if risk >= 20:
         return "REVIEW"
+
     return "ALLOW"
 
 
@@ -99,6 +113,8 @@ def main():
         "decision": decision,
         "summary": counters
     }
+
+    os.makedirs(REPORT_DIR, exist_ok=True)
 
     output_path = os.path.join(REPORT_DIR, "risk-decision.json")
     with open(output_path, "w", encoding="utf-8") as file:
