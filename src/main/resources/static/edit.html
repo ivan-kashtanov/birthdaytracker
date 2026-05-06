@@ -59,7 +59,7 @@
 
     async function loadBirthday() {
         try {
-            const response = await fetch(`http://localhost:8080/api/birthdays/${id}`);
+            const response = await fetch(`/api/birthdays/${id}`);
             const person = await response.json();
 
             document.getElementById('fullName').value = person.fullName;
@@ -94,7 +94,7 @@
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/birthdays/update/${id}`, {
+            const response = await fetch(`/api/birthdays/update/${id}`, {
                 method: 'PUT',
                 body: formData
             });
@@ -120,7 +120,7 @@
         if (!confirm('Удалить фотографию?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/api/birthdays/${id}/photo`, {
+            const response = await fetch(`/api/birthdays/${id}/photo`, {
                 method: 'DELETE'
             });
 
